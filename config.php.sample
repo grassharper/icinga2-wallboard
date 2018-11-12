@@ -1,0 +1,22 @@
+<?php
+
+/**
+ *
+ * WallBoard Configuration
+ *
+ **/
+
+// Icinga2 host
+// $ApiHost = "localhost";
+
+// Icinga2 API username
+// $ApiUser = 'root';
+
+// Icinga2 API Password
+// $ApiPass = 'icinga';
+
+// Refresh time in seconds
+// $refresh = 10; 
+
+// Set custom heading
+// $wallHeading = '<Your Custom Heading>';
