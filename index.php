@@ -89,7 +89,7 @@ function serviceTable($icinga, $services, $select = false, $type = false) {
                     }
                 }
                 print(sprintf("<tr class='%s'>\n", $rowType));
-		print(sprintf("<td class='hostname'>%s</td>\n", $service["attrs"]['host_name']));
+		print(sprintf("<td class='hostname'>%s</td>\n", $service["joins"]["host"]["display_name"]));
                 print(sprintf("<td class='service'>%s</td>\n", $service["attrs"]['display_name']));
                 print(sprintf("<td class='state'>%s", $state));
                 if ($service["attrs"]["check_attempt"] < $service["attrs"]["max_check_attempts"]) {
