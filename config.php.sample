@@ -20,3 +20,6 @@
 
 // Set custom heading
 // $wallHeading = '<Your Custom Heading>';
+
+// Also show hostname in host and service lists
+// $showHostname = TRUE;

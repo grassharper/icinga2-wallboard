@@ -28,6 +28,9 @@ $refresh = 10;
 // Default heading
 $wallHeading = 'Icinga2 Monitoring System';
 
+// Also show hostname in host and service lists
+$showHostname = FALSE;
+
 // Icinga 2 API: PHP API client
 require_once('api.php');
 
@@ -69,6 +72,8 @@ function duration($end) {
 	return sprintf("%dd, %02d:%02d:%02d", $days, $hours, $minutes, $secs);
 }
 function serviceTable($icinga, $services, $select = false, $type = false) {
+	global $showHostname;
+
 	if (false === $type) {
 		print("<table><tr>\n");
 	} else {
@@ -89,7 +94,11 @@ function serviceTable($icinga, $services, $select = false, $type = false) {
                     }
                 }
                 print(sprintf("<tr class='%s'>\n", $rowType));
-		print(sprintf("<td class='hostname'>%s</td>\n", $service["joins"]["host"]["display_name"]));
+		if ($showHostname) {
+			print(sprintf("<td class='hostname'>%s(%s)</td>\n", $service["joins"]["host"]["display_name"], $service["attrs"]["host_name"]));
+                } else {
+			print(sprintf("<td class='hostname'>%s</td>\n", $service["joins"]["host"]["display_name"]));
+                }
                 print(sprintf("<td class='service'>%s</td>\n", $service["attrs"]['display_name']));
                 print(sprintf("<td class='state'>%s", $state));
                 if ($service["attrs"]["check_attempt"] < $service["attrs"]["max_check_attempts"]) {
@@ -221,7 +230,11 @@ if ($counter['hosts']['down']) {
 	foreach($states['hosts']['down'] as $host) {
 		$state = $icinga["host"][$host["attrs"]["state"]];
 		echo "<tr class='".$state."'>\n";
-		echo "<td class='hostname'>{$host["attrs"]["display_name"]}</td>\n";
+		if ($showHostname) {
+			echo "<td class='hostname'>{$host["attrs"]["display_name"]}({$host["attrs"]["__name"]})</td>\n";
+		} else {
+			echo "<td class='hostname'>{$host["attrs"]["display_name"]}</td>\n";
+		}
 		echo "<td class='state'>{$state}</td>\n";
 		echo "<td class='duration'>".duration($host["last_state_change"])."</td>\n";
         print(sprintf("<td class='output'>%s</td>\n", strip_tags($host["attrs"]["last_check_result"]['output'])));
