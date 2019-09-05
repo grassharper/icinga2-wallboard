@@ -84,31 +84,40 @@ function serviceTable($icinga, $services, $select = false, $type = false) {
     foreach ($select as $selectedType) {
         if ($services[$selectedType]) {
             foreach ($services[$selectedType] as $service) {
-                $state = $icinga["service"][$service["attrs"]["state"]];
-                if (false === $type) {
-                    $rowType = $state;
-                } else {
-                    $rowType = $type;
-                    if ("acknowledged" !== $type) {
-                        $state = $type;
+                $showService = true;
+                if (in_array($service["joins"]["host"]["acknowledgement"], array("1", "2"))) {
+                    $showService = false;
+                }
+                if ($service["joins"]["host"]["state"] == $icinga["host"]["down"]) {
+                    $showService = false;
+                }
+                if ($showService) {
+                    $state = $icinga["service"][$service["attrs"]["state"]];
+                    if (false === $type) {
+                        $rowType = $state;
+                    } else {
+                        $rowType = $type;
+                        if ("acknowledged" !== $type) {
+                            $state = $type;
+                        }
                     }
-                }
-                print(sprintf("<tr class='%s'>\n", $rowType));
-		if ($showHostname) {
-			print(sprintf("<td class='hostname'>%s(%s)</td>\n", $service["joins"]["host"]["display_name"], $service["attrs"]["host_name"]));
-                } else {
-			print(sprintf("<td class='hostname'>%s</td>\n", $service["joins"]["host"]["display_name"]));
-                }
-                print(sprintf("<td class='service'>%s</td>\n", $service["attrs"]['display_name']));
-                print(sprintf("<td class='state'>%s", $state));
-                if ($service["attrs"]["check_attempt"] < $service["attrs"]["max_check_attempts"]) {
-                    print(" (Soft)");
-                }
-                print("</td>\n");
-                print(sprintf("<td class='duration'>%s</td>\n", duration($service["attrs"]['last_state_change'])));
-                print(sprintf("<td class='attempts'>%s/%s</td>\n", $service["attrs"]['check_attempt'], $service["attrs"]['max_check_attempts']));
-                print(sprintf("<td class='output'>%s</td>\n", strip_tags($service["attrs"]["last_check_result"]['output'], '<a>')));
-                print("</tr>\n");
+                    print(sprintf("<tr class='%s'>\n", $rowType));
+                    if ($showHostname) {
+                        print(sprintf("<td class='hostname'>%s(%s)</td>\n", $service["joins"]["host"]["display_name"], $service["attrs"]["host_name"]));
+                    } else {
+                        print(sprintf("<td class='hostname'>%s</td>\n", $service["joins"]["host"]["display_name"]));
+                    }
+                    print(sprintf("<td class='service'>%s</td>\n", $service["attrs"]['display_name']));
+                    print(sprintf("<td class='state'>%s", $state));
+                    if ($service["attrs"]["check_attempt"] < $service["attrs"]["max_check_attempts"]) {
+                        print(" (Soft)");
+                    }
+                    print("</td>\n");
+                    print(sprintf("<td class='duration'>%s</td>\n", duration($service["attrs"]['last_state_change'])));
+                    print(sprintf("<td class='attempts'>%s/%s</td>\n", $service["attrs"]['check_attempt'], $service["attrs"]['max_check_attempts']));
+                    print(sprintf("<td class='output'>%s</td>\n", strip_tags($service["attrs"]["last_check_result"]['output'], '<a>')));
+		    print("</tr>\n");
+		}
             }
         }
     }
