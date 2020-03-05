@@ -245,7 +245,7 @@ if ($counter['hosts']['down']) {
 			echo "<td class='hostname'>{$host["attrs"]["display_name"]}</td>\n";
 		}
 		echo "<td class='state'>{$state}</td>\n";
-		echo "<td class='duration'>".duration($host["last_state_change"])."</td>\n";
+		echo "<td class='duration'>".duration($host["attrs"]["last_state_change"])."</td>\n";
         print(sprintf("<td class='output'>%s</td>\n", strip_tags($host["attrs"]["last_check_result"]['output'])));
 		echo "</tr>\n";
 	}
