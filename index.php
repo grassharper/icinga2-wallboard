@@ -141,16 +141,56 @@ $states = array();
 $client = new ApiClient($ApiHost);
 $client->setCredentials($ApiUser, $ApiPass);
 
-$body = array(
-      'joins' => array(
-              'host'
-      ),
-);
+if (isset($_GET["user"])) {
+    $host_body = array(
+        'filter' => 'match(user, host.vars.notification.mail.users, MatchAny)',
+        'filter_vars' => array(
+                      'user' => $_GET["user"],
+        )
+    );
+
+    $service_body = array(
+        'joins' => array(
+                'host'
+        ),
+        'filter' => 'match(user, host.vars.notification.mail.users, MatchAny)',
+        'filter_vars' => array(
+                      'user' => $_GET["user"],
+        )
+    );
+} elseif (isset($_GET["group"])) {
+    $host_body = array(
+        'filter' => 'match(group, host.vars.notification.mail.groups, MatchAny)',
+        'filter_vars' => array(
+                      'group' => $_GET["group"],
+        )
+    );
+
+    $service_body = array(
+        'joins' => array(
+                'host'
+        ),
+        'filter' => 'match(group, host.vars.notification.mail.groups, MatchAny)',
+        'filter_vars' => array(
+                      'group' => $_GET["group"],
+        )
+    );
+} else {
+    $service_body = array(
+        'joins' => array(
+                'host'
+        ),
+    );
+}
 
 $getHeader = array('X-HTTP-Method-Override: GET');
 
-$hosts = json_decode(json_encode($client->request("post", "objects/hosts", $getHeader, null)), true);
-$services = json_decode(json_encode($client->request("post", "objects/services", $getHeader, $body)), true);
+if (isset($_GET['user']) || isset($_GET['group'])) {
+    $hosts = json_decode(json_encode($client->request("post", "objects/hosts", $getHeader, $host_body)), true);
+} else {
+    $hosts = json_decode(json_encode($client->request("post", "objects/hosts", $getHeader, null)), true);
+}
+$services = json_decode(json_encode($client->request("post", "objects/services", $getHeader, $service_body)), true);
 
 foreach($hosts as $host) {
 	if ((int)$host["attrs"]['downtime_depth'] > 0) {
